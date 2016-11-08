@@ -21,44 +21,16 @@ app.controller("MapController", ["$scope", "$http", "$routeParams", "localStorag
             showLayers: true,
             showDateScale: true,
             layers: [{
-                name: "Estratos de Barrios",
+                name: "Public",
                 points: [],
                 color: '6C2A6A',
                 selected: true,
                 opacity: 0.5,
                 values: []
             },{
-                name: "Crímenes",
+                name: "Private",
                 points: [],
                 color: 'EB403B',
-                selected: true,
-                opacity: 0.5,
-                values: []
-            },{
-                name: "Estaciones de Transmilenio",
-                points: [],
-                color: 'FBB735',
-                selected: true,
-                opacity: 0.5,
-                values: []
-            },{
-                name: "Cines",
-                points: [],
-                color: '689E2E',
-                selected: true,
-                opacity: 0.5,
-                values: []
-            },{
-                name: "Universidades",
-                points: [],
-                color: '00636B',
-                selected: true,
-                opacity: 0.5,
-                values: []
-            },{
-                name: "Estaciones de Bomberos",
-                points: [],
-                color: '39C0B3',
                 selected: true,
                 opacity: 0.5,
                 values: []
@@ -730,7 +702,7 @@ app.controller("MapController", ["$scope", "$http", "$routeParams", "localStorag
 				console.log(".");
 				var lat = values[i].point.coordinates[0];
 				var lon = values[i].point.coordinates[1];
-				points.push([lat, lon, 0.5]);
+				points.push([lat, lon, 1]);
 			}
 			var heat = L.heatLayer(points, {radius: $scope.file.radius}).addTo(map); 
 			layer.points.push(heat);
@@ -777,10 +749,12 @@ app.controller("MapController", ["$scope", "$http", "$routeParams", "localStorag
     }
 
     function removePointOfLayer(layer) {
-        _.each(layer.points, function(point) {
-            map.removeLayer(point);
-        });
-        layer.points = [];
+        if(layer) {
+            _.each(layer.points, function(point) {
+                map.removeLayer(point);
+            });
+            layer.points = [];
+        }
     }
 
     function addPointsNewCSV() {
@@ -954,42 +928,63 @@ app.controller("MapController", ["$scope", "$http", "$routeParams", "localStorag
  
 		
     }
+
+    $scope.slider;
+    $scope.initSlider = function() {
+        var slider = document.getElementById('slider');
+
+        $scope.slider = noUiSlider.create(slider, {
+            start: [4, 18],
+            connect: true,
+            range: {
+                'min': 1,
+                'max': 25
+            },
+            step: 1
+        });
+    }
+
+    $scope.loading = false;
 	$scope.refresh = function() {
-		var ids_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-		var ids_months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-		var count_request  = 0;
-		var count_response = 0;
-		for (i=0; i<7; i++){
-			var final_respones = [];
-			
-			if(document.getElementById(ids_days[i]).checked == true) {
-				count_request ++;
-				var url = "http://localhost:5000/datos/" + i + "/10/11/10/pp";
-				$http({
-					method: 'GET',
-					url: url
-				})
-				.then(function(response) {
-					count_response ++;
-					final_respones=final_respones.concat(response.data);
-					console.log("count_response",count_response,"count_request",count_request);
-					console.log(response.data)
-					if(count_response == count_request) {
-						var layer = $scope.map.layers[1];
-						
-						removePointOfLayer(layer);
-						layer.values = final_respones;
-						console.log("final_respones",final_respones);
-						showPointsOfLayer(layer);	
-					}
-				});
-				
-				
-			}
-			
+        console.log($scope.slider.get());
+        if(!$scope.loading) {
+            var hourS = $scope.slider.get()[0];
+            var hourE = $scope.slider.get()[1]
+            $scope.loading = true;
+    		var ids_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    		var ids_months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+    		var count_request  = 0;
+    		var count_response = 0;
+            for(var j = 0; j < $scope.map.layers.length; j ++) {
+                var l = $scope.map.layers[j];
+        		for (var i=0; i<7; i++){
+        			var final_respones = [];
+        			
+        			if(document.getElementById(ids_days[i]).checked == true) {
+        				count_request ++;
+        				var url = "http://localhost:5000/datos/" + i + "/" + hourS + "/" + hourE + "/10/pp";
+        				$http({
+        					method: 'GET',
+        					url: url
+        				})
+        				.then(function(response) {
+        					count_response ++;
+        					final_respones=final_respones.concat(response.data);
+        					console.log("count_response",count_response,"count_request",count_request);
+        					console.log(response.data)
+                            console.log(l);
+                            removePointOfLayer(l);
+                            l.values = final_respones;
+                            showPointsOfLayer(l);
+        					if(count_response == count_request) {
+                                $scope.loading = false;
+        						console.log("final_respones",final_respones);
+        					}
+        				});
+        			}	
+        		}
+    		}
 		}
-			
-		
 	}
     map.on('click', function(e) {
         if(!$scope.showDialogs.heatmapColors) {
@@ -1316,28 +1311,16 @@ app.controller("MapController", ["$scope", "$http", "$routeParams", "localStorag
             now.year($scope.map.year).endOf("year");
         }
         var sumDays = 0;
-        var widthOneDay = (width - 10)/365;
-        for (var i = 11; i >=0; i--) {
-            var now_copy = angular.copy(now);
-            var currentMonth = now_copy.add(-i,'months');
-            //console.log(i,currentMonth,currentMonth.format('MMM'));
-            var monthName = currentMonth.format('MMM');
-            //var monthName = $scope.dateRange.monthNames[currentMonth.month()]
-            var numerDays;
-            if (i === 0) {
-                numerDays = currentMonth.date();
-            }
-            else {
-                numerDays = currentMonth.daysInMonth();
-            }
-            sumDays += numerDays;
-            var month = {
-                name: monthName,
-                numerDays: numerDays*widthOneDay
+        var widthOneHour = (width - 10)/24;
+        for(var i = 1; i <= 24; i++) {
+            var hour = {
+                name: i + ":00",
+                numerDays: widthOneHour
             };
-            $scope.dateRange.months.push(month);
+            $scope.dateRange.months.push(hour);
         }
-        $scope.dateRange.moveRight = (365-sumDays)*widthOneDay;
+        
+        $scope.dateRange.moveRight = 50;
         $scope.changeDateInt();
     }
 

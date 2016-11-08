@@ -139,13 +139,14 @@
         <div id="map2" ng-click="hideDialogs()"></div>
       </div>
     </div>
-    <input type="range" class="rangeDates" name="rangeDates" ng-change="changeDateInt()" ng-model="dateRange.dateInt" min=0 max=364 ng-show="map.showDateScale">
+    <!--<input type="range" class="rangeDates" name="rangeDates" ng-change="changeDateInt()" ng-model="dateRange.dateInt" min=0 max=364 ng-show="map.showDateScale">-->
+    <div id="slider" ng-init="initSlider()"></div>
     <div id="rangeDateValue" ng-show="map.showDateScale">{{ dateRange.date }}</div>
     <div class="dateScale" ng-show="map.showDateScale">
       <div class="horizontalAxis"></div>
       <div class="horizontal layout">
       <div style="width: 5px"></div>
-        <div style="width: {{ dateRange.moveRight }}px"></div>
+        <!--<div style="width: {{ dateRange.moveRight }}px"></div>-->
         <div ng-repeat="(key, value) in dateRange.months" class="horizontal layout">
           <div style="width: {{ value.numerDays }}px" class="horizontal layout start">
             <div class="vertical layout center verticalAxisWithName">
@@ -169,10 +170,9 @@
     <div class="mapCheckboxOptions" ng-show="map.showLayers">
       <div style="font-weight: 400">Variables de contexto</div>
       <div style="height: 6px;"></div>
-      <div class="horizontal layout" style="font-size: 10px;"><div class="flex center-justified">Baja</div><div class="flex center-justified">Media</div><div class="flex horizontal layout center-justified">Alta</div><div style="width: 186px;"></div></div>
       <div ng-repeat="(key, value) in map.layers">
         <div class="horizontal layout center">
-          <input type="range" id="c{{ key }}" min="0" max="1" step="0.5" ng-model="value.opacity" ng-change="changeOpacity(this)"/>
+          <input type="range" id="c{{ key }}" min="0" max="1" step="1" ng-model="value.opacity" ng-change="changeOpacity(this)"/>
           <!--<input type="checkbox" id="c{{ key }}" ng-model="value.selected" ng-change="changeLayers()"/>-->
           {{ value.name }}
         </div>
