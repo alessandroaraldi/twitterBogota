@@ -50,14 +50,23 @@
       </div>
     </div>-->
     <div id="addClassDialog" ng-show="showDialogs.addCVS">
-      <div style="font-weight: 400;">Escoger proyecto</div>
+      <div style="font-weight: 400;">Months</div>
       <div id="listaProyectosMapa">
-        <div class="horizontal layout center" ng-repeat="(key,proyecto) in proyectos">
-          <div class="flex proyecto" ng-click="seleccionarProyecto(key,$event)">{{ proyecto.name }}</div>
-        </div>
+		<input type="checkbox" name="Day" value="Jenuary" id="january"> January<br>
+		<input type="checkbox" name="Day" value="February" id="february"> February<br>
+		<input type="checkbox" name="Day" value="March" id="march"> March<br>
+		<input type="checkbox" name="Day" value="April" id="april"> April<br>
+		<input type="checkbox" name="Day" value="May" id="may"> May<br>
+		<input type="checkbox" name="Day" value="June" id="june"> June<br>
+		<input type="checkbox" name="Day" value="July" id="july"> July<br>
+		<input type="checkbox" name="Day" value="August" id="august"> August<br>
+		<input type="checkbox" name="Day" value="September" id="september"> September<br>
+		<input type="checkbox" name="Day" value="October" id="october"> October<br>
+		<input type="checkbox" name="Day" value="November" id="november"> November<br>
+		<input type="checkbox" name="Day" value="December" id="december"> December<br>
       </div>
     </div>
-    <div id="posibilitiesDialog" ng-show="showDialogs.candidates">
+    <!--<div id="posibilitiesDialog" ng-show="showDialogs.candidates">
       <div style="font-weight: 400">Candidatos</div>
       <div id="listaProyectosMapa">
         <div class="horizontal layout center" ng-repeat="(key,candidate) in candidates">
@@ -67,7 +76,7 @@
             </svg>
         </div>
       </div>
-    </div>
+    </div>-->
     <div id="radiusDialog" ng-show="showDialogs.candidates">
       <div class="horizontal layout center">
         <div style="font-weight: 400">Radio de influencia</div>

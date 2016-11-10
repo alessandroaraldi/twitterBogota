@@ -942,7 +942,7 @@ header.smaller nav a {
     cursor: pointer;
     width: 217px; }
   #addClassDialog input[type="checkbox"] {
-    -webkit-appearance: none;
+    /*-webkit-appearance: none;*/
     width: 20px;
     height: 20px;
     margin: 0px;

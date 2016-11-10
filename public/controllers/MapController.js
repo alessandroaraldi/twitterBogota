@@ -956,33 +956,39 @@ app.controller("MapController", ["$scope", "$http", "$routeParams", "localStorag
     		var count_request  = 0;
     		var count_response = 0;
             for(var j = 0; j < $scope.map.layers.length; j ++) {
-                var l = $scope.map.layers[j];
-        		for (var i=0; i<7; i++){
-        			var final_respones = [];
-        			
-        			if(document.getElementById(ids_days[i]).checked == true) {
-        				count_request ++;
-        				var url = "http://localhost:5000/datos/" + i + "/" + hourS + "/" + hourE + "/10/pp";
-        				$http({
-        					method: 'GET',
-        					url: url
-        				})
-        				.then(function(response) {
-        					count_response ++;
-        					final_respones=final_respones.concat(response.data);
-        					console.log("count_response",count_response,"count_request",count_request);
-        					console.log(response.data)
-                            console.log(l);
-                            removePointOfLayer(l);
-                            l.values = final_respones;
-                            showPointsOfLayer(l);
-        					if(count_response == count_request) {
-                                $scope.loading = false;
-        						console.log("final_respones",final_respones);
-        					}
-        				});
-        			}	
-        		}
+                
+        		for (var k=0; k<12; k++){
+					if(document.getElementById(ids_months[k]).checked == true) {
+						for (var i=0; i<7; i++){
+							var final_respones = [];
+							
+							if(document.getElementById(ids_days[i]).checked == true) {
+								count_request ++;
+								var url = "http://localhost:5000/datos/" + i + "/" + hourS + "/" + hourE + "/"+ k + "/pp";
+								$http({
+									method: 'GET',
+									url: url
+								})
+								.then(function(response) {
+									var l = $scope.map.layers[j];
+									console.log($scope.map.layers[j]);
+									count_response ++;
+									final_respones=final_respones.concat(response.data);
+									console.log("count_response",count_response,"count_request",count_request);
+									console.log(response.data)
+									console.log(l);
+									removePointOfLayer(l);
+									l.values = final_respones;
+									showPointsOfLayer(l);
+									if(count_response == count_request) {
+										$scope.loading = false;
+										console.log("final_respones",final_respones);
+									}
+								});
+							}	
+						}
+					}	
+				}
     		}
 		}
 	}
